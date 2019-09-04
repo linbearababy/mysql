@@ -1,0 +1,178 @@
+for windows download & reset password: 
+
+前后花了一些时间，以前都是下载软件直接安装在本地，现在这个不一样，下载压缩包后要解压缩到安装目录，然后在控制台下配置服务。
+
+整体的流程如下：
+
+1. 下载：
+
+到http://dev.mysql.com/downloads/mysql/下载，或者登陆mysql官网按Downloads——Community——MySQL Community Server顺序访问，可以看到
+
+
+
+我的机子是64位的，于是选第二个（344.2M）。
+
+下载可能需要注册Oracle账号，这个要注意密码要字母和数字组合，字母要有大写。
+
+ 
+
+也可以不用注册，直接下载。
+
+
+
+ 
+
+ 
+
+2. 解压：
+将下载到的安装包解压到安装目录。我的安装目录是D:\Program Files\mysql-5.7.12-winx64。解压完后，一直进入到bin的父目录。如图：
+
+
+此时上图所在目录：D:\Program Files\mysql-5.7.12-winx64\mysql-5.7.12-winx64
+
+注意，上图中的文件夹data是后来新建的，解压时并没有。解压后在bin同目录下新建data目录！
+
+ 
+
+3. 配置：
+在bin同目录下可以看到my-default.ini文件，打开，在原内容[mysqld]后添加以下内容：
+
+ 
+
+basedir=D:\Program Files\mysql-5.7.12-winx64\mysql-5.7.12-winx64
+
+datadir=D:\Program Files\mysql-5.7.12-winx64\mysql-5.7.12-winx64\data
+
+port=3306
+
+#这一句解决有IPV6协议的计算机上默认采用IPV6协议导致无法从程序连接数据库的问题
+
+bind-address=127.0.0.1
+
+# 允许最大连接数
+
+max_connections = 200
+
+# 服务端使用的字符集默认为8比特编码的latin1字符集
+
+character-set-server = utf8
+
+# 创建新表时将使用的默认存储引擎
+
+default-storage-engine = INNODB
+
+
+[client]
+
+# 设置mysql客户端默认字符集
+
+default-character-set = utf8
+
+ 
+
+添加完毕后注意：basedir是安装路径，datadir是解压后新建的data文件夹的路径。
+
+ 
+
+4. 安装mysql服务
+
+4.1 开始->在面的搜索栏里面输入cmd，不要急着按enter，要右键这个cmd，以管理员的身份运行cmd。
+
+4.2 运行控制台后，将当前目录切换到bin的下一级目录，我的是D:\Program Files\mysql-5.7.12-winx64\mysql-5.7.12-winx64\bin
+
+
+
+4.3 在4.2基础上输入mysqld --initialize-insecure --user=mysql，回车。
+
+
+
+使用-initialize生成随机密码，由于自己学习，使用-initialize-insecure生成空密码。默认帐号root,后面的-user=mysql不更改。此时密码为空。
+
+4.4 再输入mysqld install，回车
+
+
+
+不用担心，我的是因为之前已经成功了，才会这样的画面。
+
+ 
+
+其实应该显示的是这样：
+
+
+
+ 
+
+4.5 再输入net start mysql，回车
+
+
+
+4.6 再输入mysql -uroot -p，回车，再回车。
+
+
+
+由于4.3设置了没有密码，所以第二下不用输密码，直接回车。
+
+ 
+
+5. 配置环境：
+
+这个是为了以后可以直接cmd，回车，直接打开Mysql。
+
+5.1 控制面板->系统和安全->系统->高级系统设置->环境变量->系统变量->Path->编辑，将mysql下的bin下一级目录的全路径放在最前面。
+
+5.2 开始->在面的搜索栏里面输入cmd->回车，直接在当前目录下输入mysql -uroot -p：
+
+
+
+ 
+
+至此，软件服务配置完成。
+
+ 
+
+ 
+
+参考：
+
+http://jingyan.baidu.com/article/0f5fb0991636376d8234ea7a.html
+
+http://jingyan.baidu.com/article/597035521d5de28fc00740e6.html
+
+http://blog.csdn.net/baidu_18607183/article/details/51250621
+
+标签: Mysql
+
+
+最后设置root的密码:
+
+方法1： 用SET PASSWORD命令
+
+MySQL -u root
+　　mysql> SET PASSWORD FOR 'root'@'localhost' = PASSWORD('newpass');
+
+for mac uninstall: (复杂）
+从终端进行操作：
+
+Summary
+To completely uninstall MySql OS X it is neccessary to remove numerous files.
+
+Symptom
+You unable to install an older version of MySql even though you thought you have removed everything.
+
+Resolution
+To uninstall MySQL and completely remove it (including all databases) from your Mac do the following:
+
+Open a terminal window
+Use mysqldump to backup your databases to text files!
+Stop the database server
+sudo rm /usr/local/mysql
+sudo rm -rf /usr/local/mysql*
+sudo rm -rf /Library/StartupItems/MySQLCOM
+sudo rm -rf /Library/PreferencePanes/My*
+edit /etc/hostconfig and remove the line MYSQLCOM=-YES-
+
+rm -rf ~/Library/PreferencePanes/My*
+sudo rm -rf /Library/Receipts/mysql*
+sudo rm -rf /Library/Receipts/MySQL*
+sudo rm -rf /private/var/db/receipts/*mysql*
+The last three lines are particularly important as otherwise, you can't install an older version of MySQL even though you think that you've completely deleted the newer version!
